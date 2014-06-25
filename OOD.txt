@@ -1,0 +1,82 @@
+Written by Paul Mould
+
+Analysis & Design Discussion for Project 2
+
+1)	The Goal of the client program:
+.	The goal of the client program is to develop a database program that will take the name of a transaction file from the keyboard, and process the requests in it.  The client program is supposed to read in the type of transaction that is supposed to be processed and then read in the input data for those transactions and use that to process the read in transactions. The client program is supposed to be able to handle transactions to Insert a record, delete a record and search and retrieve a record. 
+.	The goal is for the program ishandle the inventory for a small book company using sequential records. The  program should perform the transaction as specified in the transaction file. The program must go through the master binary file and transaction file and create two new files, a new master binary file of book records and an error text file named ERRORS. The program is supposed to read in each record in the new master file and display them to the screen. The program is supposed handle transactions for adding records, deleting records and changing the on hand amount.
+2)	Specification of input and output used by the client program:
+	Transaction File:
+.	The transaction File is an input text file of transactions that are to be processed by the client program.
+.	 The transaction file consists of a single letter on a line followed by fields associated with a compact disc on separate lines. The single letter represents one of the three available transactions (.I. = Insert, .S. = Search, .D. = Delete). All insertions will be followed by three lines of text representing the fields. The other two are followed solely by the UPC code.
+	Index File (cdv.ind):
+	The index file is an input and output text based index file of the records in the data file (see below) of CD records.
+	Each record in the index file (except the first and the last) must consist of 12 bytes to hold the characters in the key, followed by 5 bytes (left-justified, padded with spaces) to hold the characters that contain the byte where the record with that key starts in the data file, followed by 5 bytes (left-justified, padded with spaces) to hold the characters that contain the length of the records in bytes, followed by a .+. if the key has not been deleted or a .-. if the key has been deleted.
+	Data File (cdv.dat):
+.	The data file is a binary data file that stores the CD reords.
+.	 Each record in the data file consists of bytes holding the characters in the CD record, including the .|. delimiters. All input and output to this file must be done using the Read and Write operations for packed records of the DelimFieldBuffer class.
+	Stack  File (cdv.sta):
+.	The new Stack file is an input and output text file of a stack representation of an avail list in reverse order.
+.	 The first record in the avail list contains 5 bytes (left-justified, padded with spaces) giving the number of records that have been deleted. Every other record in the avail list contains 5 bytes (left-justified, padded with spaces) giving the byte where the free space starts, followed by 5 bytes (left-justified, padded with spaces) giving the size of the free space may be 0.
+
+3)	Outline of the algorithm used by my client program.
+
+
+Open the transaction file
+Start the timer to record the time it takes to process the transaction records 
+Open the index file, stack file and data file and reset them if they are empty
+While (not at end of the transaction file) Do
+	Read in the character, C representing a transaction
+	If ( C == .I.) then
+		Insert the CD records 
+	Else
+		Read in the UPC, upcVal from the transaction file
+		If (C == .D.)
+			If ( a record exists in the data file with the UPC field of upcVal) then
+				Delete the record with the UPC field of upcVal
+			Else
+Print to the screen that the record with the UPC of upcVal is not found and not deleted
+				End If
+			Else if ( C == .S. )
+				If ( a record exists in the data file with the UPC field of upcVal) then
+					Print to the screen the record with the UPC of upcVal
+				Else
+					Print to the screen that the record with the UPC of upcVal is not found
+				End If
+			End If
+		End If
+	End While
+	Print to the screen the time it took to process the transactions 
+	End
+
+		
+	
+4)	Summary of classes and Data structures:
+Classes used:
+.	Input/Output Buffer class (IO Buffer): Used to define a char array for a buffer value
+.	Variable Length Buffer Class (VariableLengthBuffer): Defines read and write operations of  variable length records.
+.	Delimited Field Buffer Class (DelimFieldBuffer): Defines the pack and unpack operations for delimited fields.
+.	CD Class (CD): The CD class represents compact disc records . 
+.	The Database Class (Dbase): The Database Class is used to support the following operations for a compact disc
+o	An operation to Insert a record
+o	An operation  to Delete a record
+o	An operation to Search a record and return a Boolean value representing if it found or not
+o	An operation to Retrieve a record and return the retrieved record in a CD type
+o	A  Reset operation to open up the index file, stack file and data file and set them up 
+o	An operation to start counting time
+o	An operation to output the time elapsed from when the start timer operation was called
+
+Heirachy of the buffer classes:
+.	IOBuffer is the base class 
+.	VariableLengthBuffer inherits from IOBuffer
+.	DelimFieldBuffer inherits from VariableLengthBuffer
+
+Data Structures used:
+.	A stack data structure was used to represent the avail list in the stack File
+.	Variable length fields and records are used to represent compact discs.
+ 
+
+
+   	
+
+
